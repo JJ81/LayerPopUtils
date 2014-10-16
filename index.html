@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko" xml:lang="ko" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<style>
+	.invisible{position:absolute;top:-9999em;left:-9999em}
+	.layerDialogue{display:none;width:270px;position:absolute;left:50%;margin-left:-135px;z-index:150}
+	.dimmedBg{width:100%;opacity:0.6;background:#000;position:absolute;top:0;left:0;z-index:100}	
+</style>
+<title>test layerPop modularity</title>
+</head>
+
+<body style="height:1000px">
+
+
+<script src="utils.js"></script>
+<script>
+	var config = {
+			popWrpClassName : "layerDialogue",
+			msg : {
+					className : "message",
+					text : "test test test test !!!"},
+			btnWrpClassName : "btnSelect",
+			btnBgElem : "dimmedBg",
+			btnContent : [ 
+				{
+					className : "btnCancel",
+					text : "No"
+				},
+				{
+					className : "btnApply",
+					text: "Yes"
+				}]
+	};
+	
+	function doPopLayer(){
+		//change message
+		config.msg.text = "Change message!";
+		// add layerPop in document
+		Utils.addLayerPop(config);  
+		Utils.fingerActionControl("mousewheel", Utils.onTouchPreventDefault, true);
+		Utils.fingerActionControl("touchmove", Utils.onTouchPreventDefault, true);
+		
+		var layer = $("." + config.popWrpClassName);
+		layer.css("top", Utils.getTargetCenter(layer));
+		$(window).bind("resize scroll", function () {
+			layer.css("top", Utils.getTargetCenter(layer));
+		});
+		layer.css("display", "block");
+		Utils.addBgLayer(config.btnBgElem);
+		
+		// button action binding!
+		$("." + config.btnContent[0].className).bind("mousedown", function(){
+			console.log("action!!");
+		});
+		
+		$("." + config.btnContent[1].className).bind("mousedown", function(){
+			console.log("action!!");
+		});
+	}
+	
+	function undoPopLayer(){
+		Utils.fingerActionControl("mousewheel", Utils.onTouchPreventDefault, false);
+		Utils.fingerActionControl("touchmove", Utils.onTouchPreventDefault, false);
+		Utils.removeLayerPop(config.popWrpClassName);
+		Utils.removeBgLayer("dimmedBg");
+	}
+	
+	doPopLayer();	
+
+</script>
+
+</body>
+</html>
